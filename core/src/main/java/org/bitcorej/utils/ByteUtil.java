@@ -2,7 +2,7 @@ package org.bitcorej.utils;
 
 import org.spongycastle.crypto.DataLengthException;
 import org.spongycastle.crypto.InvalidCipherTextException;
-import org.spongycastle.crypto.engines.AESFastEngine;
+import org.spongycastle.crypto.engines.AESEngine;
 import org.spongycastle.crypto.modes.CBCBlockCipher;
 import org.spongycastle.crypto.paddings.PaddedBufferedBlockCipher;
 import org.spongycastle.crypto.params.KeyParameter;
@@ -57,7 +57,7 @@ public class ByteUtil {
             byte[] sksBytes = new byte[32];
             System.arraycopy(result, 0, sksBytes, 0, 32);
 
-            PaddedBufferedBlockCipher cipher = new PaddedBufferedBlockCipher(new CBCBlockCipher(new AESFastEngine()));
+            PaddedBufferedBlockCipher cipher = new PaddedBufferedBlockCipher(new CBCBlockCipher(new AESEngine()));
             cipher.init(true, new ParametersWithIV(new KeyParameter(sksBytes), ivBytes));
             byte[] temp = new byte[input.length + (16 - (input.length % 16))];
             System.arraycopy(input, 0, temp, 0, input.length);
