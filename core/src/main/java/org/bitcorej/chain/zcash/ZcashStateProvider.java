@@ -134,6 +134,18 @@ public class ZcashStateProvider extends BitcoinStateProvider {
         return byteLength;
     }
 
+    public static String bytesToHex(byte[] bytes) {
+        StringBuilder hexString = new StringBuilder();
+        for (byte b : bytes) {
+            String hex = Integer.toHexString(0xFF & b); // Mask to handle negative bytes
+            if (hex.length() == 1) {
+                hexString.append('0'); // Add leading zero if necessary
+            }
+            hexString.append(hex);
+        }
+        return hexString.toString();
+    }
+
     @Override
     public String signRawTransaction(String rawTx, List<String> keys) {
         JSONObject rawTxJSON = new JSONObject(rawTx);
@@ -156,6 +168,7 @@ public class ZcashStateProvider extends BitcoinStateProvider {
                 input.getOutpoint().bitcoinSerialize(stream);
             }
             hashPrevouts = this.getBlake2bHash(stream.toByteArray(), "ZcashPrevoutHash".getBytes());
+            // System.out.println("hashPrevouts: " + bytesToHex(hashPrevouts));
 
             // calc hash outputs
             stream = new UnsafeByteArrayOutputStream();
@@ -163,6 +176,7 @@ public class ZcashStateProvider extends BitcoinStateProvider {
                 output.bitcoinSerialize(stream);
             }
             hashOutputs = this.getBlake2bHash(stream.toByteArray(), "ZcashOutputsHash".getBytes());
+            // System.out.println("hashOutputs: " + bytesToHex(hashOutputs));
 
             // calc hash sequence
             stream = new UnsafeByteArrayOutputStream();
@@ -170,6 +184,7 @@ public class ZcashStateProvider extends BitcoinStateProvider {
                 Utils.uint32ToByteStreamLE(input.getSequenceNumber(), stream);
             }
             hashSequence = this.getBlake2bHash(stream.toByteArray(), "ZcashSequencHash".getBytes());
+            // System.out.println("hashSequence: " + bytesToHex(hashSequence));
 
             List<byte[]> signatures = new ArrayList<>();
             for (int i = 0; i < tx.getInputs().size(); i++) {
@@ -226,6 +241,7 @@ public class ZcashStateProvider extends BitcoinStateProvider {
                 Utils.uint32ToByteStreamLE(input.getSequenceNumber(), stream);
 
                 byte[] hashPreimage = stream.toByteArray();
+                //System.out.println("hashPreimage: " + bytesToHex(hashPreimage));
 
                 // "ZcashSigHash".getBytes() + NumericUtil.hexToBytes("930b540d")
                 // byte[] personalization = ArrayUtils.addAll("ZcashSigHash".getBytes(), NumericUtil.hexToBytes("76b809bb"));
